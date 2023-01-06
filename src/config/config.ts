@@ -11,6 +11,12 @@ const config = {
         uriTest: env.get('MONGO_TEST_URI').required().asString(),
         blogCollectionName: env.get('COLLECTION_NAME').required().asString(),
         userCollectionName: env.get('USER_COLLECTION_NAME').required().asString(),
+        collectionsNames: {
+            product: env.get('PRODUCT_COLLECTION_NAME').required().asString(),
+            aisle: env.get('AISLE_COLLECTION_NAME').required().asString(),
+            department: env.get('DEPARTMENT_COLLECTION_NAME').required().asString(),
+            supermarket: env.get('SUPERMARKET_COLLECTION_NAME').required().asString(),
+        },
     },
     keys: {
         initializationVector: env.get('VECTOR').example('length of 16 456').required().asString(),

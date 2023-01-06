@@ -22,7 +22,6 @@ class App {
         this.routers = routers;
         this.app = express();
         this.config();
-        this.start();
     }
 
     public getApp(): express.Application {

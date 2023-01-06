@@ -8,6 +8,7 @@ export default async (uri: string) => {
     logInfo('Connecting to Mongo');
 
     await mongoose.connect(uri);
+    mongoose.set('strictQuery', false);
 
     logInfo('Mongo connection established');
 };
