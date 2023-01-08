@@ -27,12 +27,12 @@ export class ProductRepo implements IProductRepo {
     };
 
     public getById = async (productId: string): Promise<Product | null> => {
-        const product = await this.ProductModel.findById(productId).populate('author');
+        const product = await this.ProductModel.findById(productId);
         return product;
     };
 
     public getAll = async (): Promise<Product[]> => {
-        const products = await this.ProductModel.find({}).populate('author');
+        const products = await this.ProductModel.find({});
         return products;
     };
 }

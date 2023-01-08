@@ -1,13 +1,13 @@
 import * as Joi from 'joi';
 
 export const createSchema = Joi.object({
-    query: {
+    body: {
         name: Joi.string().required(),
     },
 });
 
 export const updateSchema = Joi.object({
-    query: {
+    body: {
         name: Joi.string().required(),
     },
 });

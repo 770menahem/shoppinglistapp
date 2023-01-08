@@ -5,7 +5,7 @@ import { updateSchema, createSchema } from '../joi/validator/product.schema';
 import { IProductController } from '../../interfaces/controller/product.interface';
 
 class ProductRouter {
-    public path: string = '/products';
+    public path: string = '/product';
     public router = express.Router();
     private productController: IProductController;
     private auth: express.RequestHandler;
@@ -21,12 +21,12 @@ class ProductRouter {
     }
 
     public initializeRoutes() {
-        this.router.use(this.auth);
         this.router.get('', wrapController(this.productController.getAll));
         this.router.get('/:productId', wrapController(this.productController.get));
         this.router.post('', validateRequest(createSchema), wrapController(this.productController.create));
         this.router.put('/:productId', validateRequest(updateSchema), wrapController(this.productController.update));
         this.router.delete('/:productId', wrapController(this.productController.delete));
+        this.router.use(this.auth);
     }
 }
 
