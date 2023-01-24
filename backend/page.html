@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add Store Items</title>
+    </head>
+    <body>
+        <div>
+            <p id="choosing-product"></p>
+            <p id="choosing-aisle"></p>
+            <p id="choosing-department"></p>
+            <p id="choosing-supermarket"></p>
+
+            <h2>Add Supermarket</h2>
+            <input id="supermarket-name" type="text" placeholder="Supermarket Name" />
+            <input id="supermarket-location" type="text" placeholder="Supermarket location" />
+            <button onclick="addSupermarket()">Add Supermarket</button>
+
+            <h2>Add Department</h2>
+            <input id="department-name" type="text" placeholder="Department Name" />
+            <button onclick="addDepartment()">Add Department</button>
+
+            <h2>Add Aisle</h2>
+            <input id="aisle-number" type="text" placeholder="Aisle Number" />
+            <button onclick="addAisle()">Add Aisle</button>
+
+            <h2>Add Product</h2>
+            <input id="product-name" type="text" placeholder="Product Name" />
+            <button onclick="addProduct()">Add Product</button>
+
+            <div id="section" style="display: flex; flex-direction: row; margin: 0 20px; padding: 10px">
+                <h2>Supermarkets</h2>
+            </div>
+        </div>
+
+        <script>
+            const supermarkets = [];
+            const departments = [];
+            const aisles = [];
+            const products = [];
+            let supermarket;
+            let department;
+            let aisle;
+            let product;
+
+            const setChoosing = () => {
+                document.querySelector('#choosing-product').innerHTML = `Product: ${product ? product.name : 'none'}`;
+                document.querySelector('#choosing-aisle').innerHTML = `Aisle: ${aisle ? aisle.number : 'none'}`;
+                document.querySelector('#choosing-department').innerHTML = `Department: ${department ? department.name : 'none'}`;
+                document.querySelector('#choosing-supermarket').innerHTML = `Supermarket: ${supermarket ? supermarket.name : 'none'}`;
+            };
+            const getSuper = () => {
+                fetch('http://localhost:1770/supermarkets')
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+                        supermarkets.length = 0;
+                        departments.length = 0;
+                        aisles.length = 0;
+                        products.length = 0;
+                        data.forEach((supermarket) => {
+                            supermarkets.push(supermarket);
+                            supermarket.departments.forEach((department) => {
+                                departments.push(department);
+                                department.aisles.forEach((aisle) => {
+                                    aisles.push(aisle);
+                                    aisle.products.forEach((product) => {
+                                        products.push(product);
+                                    });
+                                });
+                            });
+                        });
+
+                        document.querySelector('#section').innerHTML = `
+                        <div class="supermarkets" style="display: flex; flex-direction: row; margin: 0 20px; padding: 10px; cursor: pointer;">
+                              ${supermarkets.map((supermarket) => {
+                                  return `<div id="super=${supermarket._id}" style="border: 1px solid black; " >
+                                            <h3>${supermarket.name}</h3>
+                                            <div class="departments">
+                                                ${supermarket.departments.map((department) => {
+                                                    return `<div id="department=${department._id}">
+                                                                <h4>department ${department.name}</h4>
+                                                                <div class="aisles" 
+                                                                style="display: flex; flex-direction: row; margin: 0 20px;"
+                                                                >
+                                                                    ${department.aisles.map((aisle) => {
+                                                                        return `<div id="aisle-${aisle._id}">
+                                                                                  <h5>aisle-${aisle.number}</h5>
+                                                                                  <div class="products" 
+                                                                                    style="display: flex; flex-direction: row; margin: 0 20px;"
+                                                                                  >
+                                                                                    <span style="text-decoration: underline;">products</span>
+                                                                                      ${aisle.products.map((product) => {
+                                                                                          return `<div id="product-${product._id}" >
+                                                                                                      <h6>${product.name}</h6>
+                                                                                                  </div>`;
+                                                                                      })}
+                                                                                  </div> 
+                                                                                </div>`;
+                                                                    })}
+                                                              </div>
+                                                            </div>`;
+                                                })}
+                                                </div>
+                                                </div>`;
+                              })}
+                                            </div>
+                              `.replace(/,/g, '');
+
+                        // delete and return the events
+                        document.querySelectorAll('.supermarkets')?.forEach((superm) => {
+                            superm.addEventListener('click', (event) => {
+                                if (event.target.id.includes('super')) {
+                                    const supermarketId = event.target.id.split('=')[1];
+                                    console.log(supermarketId);
+                                    supermarket = supermarkets.find((supermarket) => supermarket._id === supermarketId);
+                                    setChoosing();
+                                    console.log(superm);
+                                }
+                            });
+                        });
+
+                        document.querySelectorAll('.departments')?.forEach((dep) => {
+                            console.log(dep);
+                            dep.addEventListener('click', (event) => {
+                                if (event.target.id.includes('department')) {
+                                    const departmentId = event.target.id.split('=')[1];
+                                    console.log(departmentId);
+                                    department = departments.find((department) => department._id === departmentId);
+                                    setChoosing();
+                                    console.log(dep);
+                                }
+                            });
+                        });
+
+                        document.querySelectorAll('.aisles').forEach((d) => {
+                            d.addEventListener('click', (event) => {
+                                console.log(event.target.id);
+                                if (event.target.id.includes('aisle')) {
+                                    const aisleId = event.target.id.split('-')[1];
+                                    console.log(aisleId);
+                                    aisle = aisles.find((aisle) => aisle._id === aisleId);
+                                    setChoosing();
+                                    console.log(aisle);
+                                }
+                            });
+                        });
+
+                        document.querySelectorAll('.products')?.forEach((p) => {
+                            p.addEventListener('click', (event) => {
+                                if (event.target.id.includes('product')) {
+                                    const productId = event.target.id.split('-')[1];
+                                    console.log(productId);
+                                    product = products.find((product) => product._id === productId);
+                                    setChoosing();
+                                    console.log(p);
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+
+                setChoosing();
+            };
+            getSuper();
+
+            function addSupermarket() {
+                const supermarketName = document.getElementById('supermarket-name').value;
+                const supermarketLocation = document.getElementById('supermarket-location').value;
+                // fetch to localhost:1770/supermarkets
+                fetch('http://localhost:1770/supermarkets', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: supermarketName,
+                        location: supermarketLocation,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+                        supermarkets.push(data);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+                getSuper();
+            }
+            function addDepartment() {
+                const departmentName = document.getElementById('department-name').value;
+                console.log(departmentName + ' name');
+                // fetch to localhost:1770/departments
+                fetch('http://localhost:1770/departments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: departmentName,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+                        departments.push(data);
+                        if (supermarket) {
+                            fetch(`http://localhost:1770/supermarkets/${supermarket._id}/department/${data._id}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                            })
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    console.log(data);
+                                    getSuper();
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                });
+                        }
+                        getSuper();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            }
+
+            function addAisle() {
+                const aisleNumber = document.getElementById('aisle-number').value;
+
+                // fetch to localhost:1770/aisles
+                fetch('http://localhost:1770/aisles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        number: aisleNumber,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+                        aisles.push(data);
+
+                        if (department) {
+                            fetch(`http://localhost:1770/departments/${department._id}/aisle/${data._id}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                            })
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    console.log(data);
+                                    getSuper();
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                });
+                        } else {
+                            getSuper();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            }
+
+            function addProduct() {
+                const productName = document.getElementById('product-name').value;
+
+                // fetch to localhost:1770/products
+                fetch('http://localhost:1770/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: productName,
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+                        products.push(data);
+                        if (aisle) {
+                            fetch(`http://localhost:1770/aisles/${aisle._id}/product/${data._id}`, {
+                                method: 'PATCH',
+                            })
+                                .then((response) => response.json())
+                                .then((data) => {
+                                    console.log(data);
+                                    getSuper();
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                    getSuper();
+                                });
+                        } else {
+                            getSuper();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            }
+        </script>
+    </body>
+</html>

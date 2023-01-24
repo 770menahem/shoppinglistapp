@@ -1,0 +1,67 @@
+{
+  "variables": [],
+  "info": {
+    "name": "Product Routes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get all products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/products",
+          "path": ["products"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get product by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/products/{{productId}}",
+          "path": ["products", "{{productId}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create new product",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n\t\"name\": \"{{productName}}\"\n}"
+        },
+        "url": {
+          "raw": "{{url}}/products",
+          "path": ["products"]
+        }
+      },
+      "response": []
+    },
+    {
+      "id": "9b8efb44-f72f-4b10-b6f8-c0aabd7a4bfd",
+      "name": "Delete product by ID",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/products/{{productId}}",
+          "path": ["products", "{{productId}}"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
