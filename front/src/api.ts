@@ -1,5 +1,4 @@
 import { Directions } from './types/aisle.type';
-import Supermarket from './types/supermarket.type';
 
 const fetchReq = async (url: string, method: string, body?: any) => {
   const res = await fetch('http://localhost:1770' + url, {

@@ -57,7 +57,7 @@ export function Aisle({ aisle }: Props): JSX.Element {
           dispatch(deleteAisle(aisle._id!) as any);
         }}
       >
-        x
+        x{/* {aisle.direction.includes('horizontal') ? ' >' : ' v'} */}
       </span>
       <div>{aisle.number}</div>
       <div>

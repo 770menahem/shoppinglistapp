@@ -1,12 +1,26 @@
 import { deleteDepartment } from '../store/asyncThunks';
 import { setCurrDepartmentId, useAppDispatch } from '../store/reducers';
-import AisleType from '../types/aisle.type';
 import DepartmentType from '../types/department.type';
-import Supermarket from '../types/supermarket.type';
+
 import { Aisle } from './Aisle';
 
 export function Department({ department }: { department: DepartmentType }): JSX.Element {
   const dispatch = useAppDispatch();
+
+  const result = department.aisles.reduce(
+    (acc, aisle) => {
+      if (aisle.direction.includes('end')) {
+        acc[2].push(aisle);
+      } else if (aisle.direction.includes('start')) {
+        acc[0].push(aisle);
+      } else {
+        acc[1].push(aisle);
+      }
+      return acc;
+    },
+    [[], [], []] as typeof department.aisles[]
+  );
+
   return (
     <div
       style={{
@@ -24,51 +38,13 @@ export function Department({ department }: { department: DepartmentType }): JSX.
 
       <div>{department.name}</div>
 
-      <div style={{}}>
-        {department.aisles.find((aisle) => aisle.direction.includes('start')) && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-            }}
-          >
-            {department.aisles
-              .filter((aisle) => aisle.direction.includes('start'))
-              .map((aisle) => {
-                return <Aisle key={aisle._id} aisle={aisle} />;
-              })}
-          </div>
-        )}
-
-        {
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-            }}
-          >
-            {department.aisles
-              .filter(
-                (aisle) => !aisle.direction.includes('start') && !aisle.direction.includes('end')
-              )
-              .map((aisle) => {
-                return <Aisle key={aisle._id} aisle={aisle} />;
-              })}
-          </div>
-        }
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-          }}
-        >
-          {department.aisles
-            .filter((aisle) => aisle.direction.includes('end'))
-            .map((aisle) => {
-              return <Aisle key={aisle._id} aisle={aisle} />;
-            })}
+      {result.map((aisles, i) => (
+        <div key={i} style={{ display: 'flex', flexDirection: 'row' }}>
+          {aisles.map((aisle) => {
+            return <Aisle key={aisle._id} aisle={aisle} />;
+          })}
         </div>
-      </div>
+      ))}
     </div>
   );
 }

@@ -48,6 +48,9 @@ export const supermarketSlice = createSlice({
       console.log('setCurrAisleId');
 
       state.currAisleId = action.payload;
+      state.currDepartmentId = state.supermarket.departments.find((d) =>
+        d.aisles.find((a) => a._id === action.payload)
+      )?._id;
     },
     setCurrProductId: (state, action) => {
       console.log('setCurrProductId');

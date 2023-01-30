@@ -28,7 +28,6 @@ export default function SuperList() {
               flexDirection: 'row',
               padding: '2px',
               cursor: 'pointer',
-              flexWrap: 'wrap',
               border: '1px solid black',
               justifyContent: 'center',
             }}
