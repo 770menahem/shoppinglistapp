@@ -1,8 +1,10 @@
+import { createSchema } from './../joi/validator/aisle.schema';
 import * as express from 'express';
 import { wrapController } from '../utils/wraps';
 // import validateRequest from '../joi/joi';
 // import { updateSchema, createSchema } from '../joi/validator/aisle.schema';
 import { IAisleController } from '../../interfaces/controller/aisle.interface';
+import validateRequest from '../joi/joi';
 
 class AisleRouter {
     public path: string = '/aisles';
@@ -24,9 +26,10 @@ class AisleRouter {
         this.router.use(this.auth);
         this.router.get('', wrapController(this.aisleController.getAll));
         this.router.get('/:aisleId', wrapController(this.aisleController.getById));
+        this.router.patch('/:aisleId', wrapController(this.aisleController.update));
         this.router.patch('/:aisleId/product/:productId', wrapController(this.aisleController.addProduct));
         this.router.delete('/:aisleId/product/:productId', wrapController(this.aisleController.removeProduct));
-        this.router.post('', wrapController(this.aisleController.create));
+        this.router.post('', validateRequest(createSchema), wrapController(this.aisleController.create));
         this.router.put('/:aisleId', wrapController(this.aisleController.update));
         this.router.delete('/:aisleId', wrapController(this.aisleController.delete));
     }

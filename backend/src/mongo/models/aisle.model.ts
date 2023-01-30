@@ -8,6 +8,11 @@ const aisleSchema = new mongoose.Schema<aisle>(
     {
         number: { type: Number, required: true },
         products: [{ type: mongoose.Types.ObjectId, ref: mongo.collectionsNames.product }],
+        direction: {
+            type: String,
+            enum: ['vertical', 'horizontal', 'end-horizontal', 'end-vertical', 'start-horizontal', 'start-vertical'],
+            required: true,
+        },
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now },
     },

@@ -21,8 +21,8 @@ export class AisleController implements IAisleController {
 
     public update = async (req: Request, res: Response) => {
         const aisleId = req.params.aisleId;
-        const description = req.body.description;
-        const aisle: Aisle | null = await this.aisleService.update(aisleId, description);
+        const direction = req.body.direction;
+        const aisle: Aisle | null = await this.aisleService.update(aisleId, direction);
         if (!aisle) res.status(404).send({ error: 'fail to update aisle' });
         else res.send(aisle);
     };

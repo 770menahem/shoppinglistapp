@@ -1,33 +1,44 @@
 import React, { CSSProperties } from 'react';
+import { createAisle, createDepartment, createProduct } from '../store/asyncThunks';
+import { useAppDispatch, useAppSelector } from '../store/reducers';
+import { Directions } from '../types/aisle.type';
+import DirectionSelect from './directionSelect';
 
-type Props = {
-  addSupermarket: (txt: string, location: string) => void;
-  addDepartment: (txt: string) => void;
-  addAisle: (num: number) => void;
-  addProduct: (txt: string) => void;
-  supermarket?: string;
-  department?: string;
-  aisle?: string;
-};
+export default function AddOption() {
+  const dispatch = useAppDispatch();
 
-export default function AddOption({
-  addSupermarket,
-  addDepartment,
-  addAisle,
-  addProduct,
-  supermarket,
-  department,
-  aisle,
-}: Props) {
+  const supermarket = useAppSelector((state) => state.supermarket);
+  const supermarketId = useAppSelector((state) => state.currSupermarketId);
+  const departmentId = useAppSelector((state) => state.currDepartmentId);
+  const aisleId = useAppSelector((state) => state.currAisleId);
+  const department = supermarket.departments.find((d) => d._id === departmentId);
+  const aisle = department?.aisles.find((a) => a._id === aisleId);
+
   const [supermarketName, setSupermarketName] = React.useState('');
   const [supermarketLocation, setSupermarketLocation] = React.useState('');
   const [departmentName, setDepartmentName] = React.useState('');
   const [aisleNumber, setAisleNumber] = React.useState('');
+  const [direction, setDirection] = React.useState<Directions>('vertical');
   const [productName, setProductName] = React.useState('');
 
   const styleFlex: CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
+  };
+
+  const addSupermarket = async (supermarketName: string, supermarketLocation: string) => {
+    dispatch(createSupermarket({ name: supermarketName, location: supermarketLocation }) as any);
+  };
+
+  const addAisle = async (number: number, direction: Directions) => {
+    dispatch(createAisle({ number, direction, departmentId: departmentId! }) as any);
+  };
+  const addProduct = async (name: string, aisleId: string) => {
+    dispatch(createProduct({ name: productName, aisleId: aisleId! }) as any);
+  };
+
+  const addDepartment = async (name: string) => {
+    dispatch(createDepartment({ name, supermarketId: supermarketId! }) as any);
   };
 
   return (
@@ -41,13 +52,13 @@ export default function AddOption({
       <div>
         {supermarket && <div>הוספה ל</div>}
         <div>
-          {supermarket && <div>סופר: {supermarket}</div>}
-          {department && <div>מחלקה: {department}</div>}
-          {aisle && <div>מעבר : {aisle}</div>}
+          {supermarketId && <div>{supermarket.name}</div>}
+          {department && <div>{department.name}</div>}
+          {aisle && <div>{aisle.number}</div>}
         </div>
       </div>
       <div>
-        {!aisle && !department && !supermarket && (
+        {!aisle && !department && !supermarketId && (
           <div style={styleFlex}>
             <input
               id='supermarket-name'
@@ -66,7 +77,7 @@ export default function AddOption({
             </button>
           </div>
         )}
-        {!department && supermarket && (
+        {!department && supermarketId && (
           <div style={styleFlex}>
             <input
               id='department-name'
@@ -85,7 +96,9 @@ export default function AddOption({
               placeholder='Aisle Number'
               onChange={(e) => setAisleNumber(e.target.value)}
             />
-            <button onClick={() => addAisle(+aisleNumber)}>הוספת מעבר</button>
+            {/* add direction select */}
+            <DirectionSelect direction={direction} setDirection={setDirection} />
+            <button onClick={() => addAisle(+aisleNumber, direction)}>הוספת מעבר</button>
           </div>
         )}
         {aisle && department && supermarket && (
@@ -96,10 +109,13 @@ export default function AddOption({
               placeholder='Product Name'
               onChange={(e) => setProductName(e.target.value)}
             />
-            <button onClick={() => addProduct(productName)}>הוספת מוצר</button>
+            <button onClick={() => addProduct(productName, aisleId!)}>הוספת מוצר</button>
           </div>
         )}
       </div>
     </div>
   );
+}
+function createSupermarket(arg0: { name: string; location: string }): any {
+  throw new Error('Function not implemented.');
 }
