@@ -1,29 +1,21 @@
-import React, { CSSProperties } from 'react';
+import { observer } from 'mobx-react-lite';
+import React, { CSSProperties, useState } from 'react';
+import store from '../store';
+import { createAisle, createDepartment, createProduct, createSuper } from '../store/actions';
+import { Directions } from '../types/aisle.type';
+import DirectionSelect from './directionSelect';
 
-type Props = {
-  addSupermarket: (txt: string, location: string) => void;
-  addDepartment: (txt: string) => void;
-  addAisle: (num: number) => void;
-  addProduct: (txt: string) => void;
-  supermarket?: string;
-  department?: string;
-  aisle?: string;
-};
-
-export default function AddOption({
-  addSupermarket,
-  addDepartment,
-  addAisle,
-  addProduct,
-  supermarket,
-  department,
-  aisle,
-}: Props) {
+function AddOption() {
   const [supermarketName, setSupermarketName] = React.useState('');
   const [supermarketLocation, setSupermarketLocation] = React.useState('');
   const [departmentName, setDepartmentName] = React.useState('');
   const [aisleNumber, setAisleNumber] = React.useState('');
   const [productName, setProductName] = React.useState('');
+  const [direction, setDirection] = useState<Directions>('vertical');
+
+  const { supermarket, currSupermarketId, currDepartmentId, currAisleId } = store;
+  const department = supermarket.departments.find((d) => d._id === currDepartmentId);
+  const aisle = department?.aisles.find((a) => a._id === currAisleId);
 
   const styleFlex: CSSProperties = {
     display: 'flex',
@@ -41,13 +33,13 @@ export default function AddOption({
       <div>
         {supermarket && <div>הוספה ל</div>}
         <div>
-          {supermarket && <div>סופר: {supermarket}</div>}
-          {department && <div>מחלקה: {department}</div>}
-          {aisle && <div>מעבר : {aisle}</div>}
+          {currSupermarketId && <div>{supermarket.name}</div>}
+          {department && <div>{department.name}</div>}
+          {aisle && <div>{aisle.number}</div>}
         </div>
       </div>
       <div>
-        {!aisle && !department && !supermarket && (
+        {!aisle && !department && !currSupermarketId && (
           <div style={styleFlex}>
             <input
               id='supermarket-name'
@@ -61,12 +53,12 @@ export default function AddOption({
               placeholder='Supermarket location'
               onChange={(e) => setSupermarketLocation(e.target.value)}
             />
-            <button onClick={() => addSupermarket(supermarketName, supermarketLocation)}>
+            <button onClick={() => createSuper(supermarketName, supermarketLocation)}>
               הוספת סופרמרקט
             </button>
           </div>
         )}
-        {!department && supermarket && (
+        {!department && currSupermarketId && (
           <div style={styleFlex}>
             <input
               id='department-name'
@@ -74,7 +66,7 @@ export default function AddOption({
               placeholder='Department Name'
               onChange={(e) => setDepartmentName(e.target.value)}
             />
-            <button onClick={() => addDepartment(departmentName)}>הוספת מחלקה</button>
+            <button onClick={() => createDepartment(departmentName)}>הוספת מחלקה</button>
           </div>
         )}
         {!aisle && department && supermarket && (
@@ -85,7 +77,8 @@ export default function AddOption({
               placeholder='Aisle Number'
               onChange={(e) => setAisleNumber(e.target.value)}
             />
-            <button onClick={() => addAisle(+aisleNumber)}>הוספת מעבר</button>
+            <DirectionSelect direction={direction} setDirection={setDirection} />
+            <button onClick={() => createAisle(+aisleNumber, direction)}>הוספת מעבר</button>
           </div>
         )}
         {aisle && department && supermarket && (
@@ -96,10 +89,12 @@ export default function AddOption({
               placeholder='Product Name'
               onChange={(e) => setProductName(e.target.value)}
             />
-            <button onClick={() => addProduct(productName)}>הוספת מוצר</button>
+            <button onClick={() => createProduct(productName)}>הוספת מוצר</button>
           </div>
         )}
       </div>
     </div>
   );
 }
+
+export default observer(AddOption);

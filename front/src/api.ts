@@ -1,3 +1,4 @@
+import { Directions } from './types/aisle.type';
 import Supermarket from './types/supermarket.type';
 
 const fetchReq = async (url: string, method: string, body?: any) => {
@@ -32,22 +33,22 @@ const getProducts = async () => {
 };
 
 const getSupermarket = async (id: string) => {
-  const res = await fetch(`/supermarkets/${id}`);
+  const res = await fetchReq(`/supermarkets/${id}`, 'GET');
   return res.json();
 };
 
 const getDepartment = async (id: string) => {
-  const res = await fetch(`/departments/${id}`);
+  const res = await fetchReq(`/departments/${id}`, 'GET');
   return res.json();
 };
 
 const getAisle = async (id: string) => {
-  const res = await fetch(`/aisles/${id}`);
+  const res = await fetchReq(`/aisles/${id}`, 'GET');
   return res.json();
 };
 
 const getProduct = async (id: string) => {
-  const res = await fetch(`/products/${id}`);
+  const res = await fetchReq(`/products/${id}`, 'GET');
   return res.json();
 };
 
@@ -81,8 +82,8 @@ const createDepartment = async (name: string) => {
   return res.json();
 };
 
-const createAisle = async (number: number) => {
-  const res = await fetchReq('/aisles', 'POST', { number });
+const createAisle = async (number: number, direction: Directions) => {
+  const res = await fetchReq('/aisles', 'POST', { number, direction });
   return res.json();
 };
 
@@ -103,6 +104,11 @@ const connectDepartmentToAisle = async (departmentId: string, aisleId: string) =
 
 const connectAisleToProduct = async (aisleId: string, productId: string) => {
   const res = await fetchReq(`/aisles/${aisleId}/product/${productId}`, 'PATCH');
+  return res.json();
+};
+
+const changeAisleDirection = async (aisleId: string, direction: Directions) => {
+  const res = await fetchReq(`/aisles/${aisleId}`, 'PATCH', { direction });
   return res.json();
 };
 
@@ -135,4 +141,7 @@ export default {
   connectSupermarketToDepartment,
   connectDepartmentToAisle,
   connectAisleToProduct,
+
+  // change
+  changeAisleDirection,
 };

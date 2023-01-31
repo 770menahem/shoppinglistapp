@@ -1,62 +1,54 @@
-import AisleType from '../types/aisle.type';
+import { observer } from 'mobx-react-lite';
+import store from '../store';
+import { deleteDepartment } from '../store/actions';
 import DepartmentType from '../types/department.type';
-import Supermarket from '../types/supermarket.type';
-import { Aisle } from './Aisle';
+import Aisle from './Aisle';
 
-export function Department({
-  supermarket,
+export default observer(function Department({
   department,
-  chooseDepartment,
-  chooseAisle,
-  deleteEntity,
 }: {
-  supermarket: Supermarket;
   department: DepartmentType;
-  chooseDepartment: (department: DepartmentType, supermarket: Supermarket) => void;
-  chooseAisle: (aisle: AisleType, department: DepartmentType, supermarket: Supermarket) => void;
-  deleteEntity: (id: string, type: string) => void;
 }): JSX.Element {
+  const result = department.aisles.reduce(
+    (acc, aisle) => {
+      if (aisle.direction?.includes('end')) {
+        acc[2].push(aisle);
+      } else if (aisle.direction?.includes('start')) {
+        acc[0].push(aisle);
+      } else {
+        acc[1].push(aisle);
+      }
+      return acc;
+    },
+    [[], [], []] as typeof department.aisles[]
+  );
+
   return (
     <div
+      style={{
+        padding: '2px',
+        margin: '2px',
+        cursor: 'pointer',
+        border: '1px solid blue',
+      }}
       onClick={(e) => {
         e.stopPropagation();
-        chooseDepartment(department, supermarket);
+        console.log('department clicked');
+        store.setCurrDepartmentId = department._id;
       }}
     >
-      <span onClick={() => deleteEntity(department._id!, 'department')}>x</span>
+      {store.currDepartmentId === department._id && (
+        <span onClick={() => deleteDepartment(department._id)}>x</span>
+      )}
 
       <div>{department.name}</div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-        }}
-      >
-        {department.aisles.map((aisle) => {
-          return (
-            <div
-              key={aisle._id}
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-
-                padding: '2px',
-                margin: ' 0 5px',
-                cursor: 'pointer',
-                border: '1px solid black',
-              }}
-            >
-              <Aisle
-                aisle={aisle}
-                department={department}
-                supermarket={supermarket}
-                chooseAisle={chooseAisle}
-                deleteEntity={deleteEntity}
-              />
-            </div>
-          );
-        })}
-      </div>
+      {result.map((aisles, i) => (
+        <div key={i} style={{ display: 'flex', flexDirection: 'row' }}>
+          {aisles.map((aisle) => {
+            return <Aisle key={aisle._id} aisle={aisle} />;
+          })}
+        </div>
+      ))}
     </div>
   );
-}
+});

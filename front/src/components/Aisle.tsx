@@ -1,49 +1,58 @@
-import React from 'react';
-import AisleType from '../types/aisle.type';
-import Department from '../types/department.type';
-import ProductType from '../types/product.type';
-import Supermarket from '../types/supermarket.type';
-import { Product } from './Product';
+import { observer } from 'mobx-react-lite';
+import { useEffect, useState } from 'react';
+import store from '../store';
+import { changeAisleDirection, deleteAisle } from '../store/actions';
+import AisleType, { Directions } from '../types/aisle.type';
+import DirectionSelect from './directionSelect';
+import Modal from './modal';
+import Product from './Product';
 
-export function Aisle({
-  supermarket,
-  department,
-  aisle,
-  chooseAisle,
-  deleteEntity,
-}: {
-  supermarket: Supermarket;
-  department: Department;
-  aisle: AisleType;
-  chooseAisle: (aisle: AisleType, department: Department, supermarket: Supermarket) => void;
-  deleteEntity: (id: string, type: string) => void;
-}): JSX.Element {
+export default observer(function Aisle({ aisle }: { aisle: AisleType }): JSX.Element {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [direction, setDirection] = useState<Directions>(aisle.direction);
+
+  useEffect(() => {
+    if (direction !== aisle.direction) {
+      changeAisleDirection(aisle._id, direction);
+    }
+  }, [direction]);
+
+  const isHorizontal = aisle.direction?.includes('horizontal');
+
   return (
     <div
-      id={`aisle-${aisle._id}`}
+      style={{
+        width: isHorizontal ? '-webkit-fill-available' : '100%',
+        height: !isHorizontal ? '-webkit-fill-available' : '100%',
+        border: '1px solid purple',
+        margin: '5px',
+      }}
       onClick={(e) => {
         e.stopPropagation();
-        chooseAisle(aisle, department, supermarket);
+        store.setCurrAisleId = aisle._id;
       }}
     >
-      <span onClick={() => deleteEntity(aisle._id!, 'aisle')}>x</span>
-      <div>מעבר {aisle.number}</div>
+      {isModalOpen && (
+        <Modal isOpen={true} onClose={() => setIsModalOpen(false)}>
+          <div>
+            <span>Change aisle direction</span>
+            <DirectionSelect direction={direction} setDirection={setDirection} />
+          </div>
+        </Modal>
+      )}
+      {store.currAisleId === aisle._id && <span onClick={() => deleteAisle(aisle._id)}>x</span>}
+      <div onClick={(e) => setIsModalOpen(true)}>{aisle.number}</div>
       <div>
-        {aisle.products.map((product) => {
-          return (
-            <div
-              key={product._id}
-              style={{
-                padding: '0 2px',
-                cursor: 'pointer',
-                border: '1px solid black',
-              }}
-            >
-              <Product product={product} deleteEntity={deleteEntity} />
-            </div>
-          );
-        })}
+        <div style={{ display: 'flex', flexDirection: !isHorizontal ? 'column' : 'row' }}>
+          {aisle.products.map((product) => {
+            return (
+              <div key={product._id} style={{ margin: isHorizontal ? '5px 2px' : '2px 5px' }}>
+                <Product product={product} />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
-}
+});
