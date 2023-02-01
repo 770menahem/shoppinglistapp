@@ -13,7 +13,7 @@ function SuperList() {
   };
 
   return (
-    <div onClick={chooseSupermarket}>
+    <div>
       <div style={{ border: '1px solid green' }}>
         {store.currSupermarketId === supermarket._id && (
           <span onClick={() => deleteSupermarket(supermarket._id)}>x</span>
@@ -36,6 +36,7 @@ function SuperList() {
           })}
         </div>
       </div>
+      <div onClick={chooseSupermarket}>+</div>
     </div>
   );
 }

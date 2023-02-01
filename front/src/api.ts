@@ -108,7 +108,7 @@ const connectAisleToProduct = async (aisleId: string, productId: string) => {
 };
 
 const changeAisleDirection = async (aisleId: string, direction: Directions) => {
-  const res = await fetchReq(`/aisles/${aisleId}`, 'PATCH', { direction });
+  const res = await fetchReq(`/aisles/${aisleId}`, 'PUT', { direction });
   return res.json();
 };
 

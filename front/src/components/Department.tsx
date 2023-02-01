@@ -31,11 +31,6 @@ export default observer(function Department({
         cursor: 'pointer',
         border: '1px solid blue',
       }}
-      onClick={(e) => {
-        e.stopPropagation();
-        console.log('department clicked');
-        store.setCurrDepartmentId = department._id;
-      }}
     >
       {store.currDepartmentId === department._id && (
         <span onClick={() => deleteDepartment(department._id)}>x</span>
@@ -49,6 +44,16 @@ export default observer(function Department({
           })}
         </div>
       ))}
+
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          console.log('department clicked');
+          store.setCurrDepartmentId = department._id;
+        }}
+      >
+        +
+      </div>
     </div>
   );
 });

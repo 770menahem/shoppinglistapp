@@ -40,6 +40,8 @@ class Store {
   };
 
   set setSupermarkets(supers: Supermarket[]) {
+    console.log('setSupermarkets');
+
     this.supermarkets = supers.map((s: Supermarket) => ({
       name: s.name,
       _id: s._id,
@@ -48,6 +50,8 @@ class Store {
   }
 
   set setCurrSupermarketId(id: string) {
+    console.log('setCurrSupermarketId');
+
     this.currSupermarketId = id;
     this.currDepartmentId = '';
     this.currAisleId = '';
@@ -55,20 +59,45 @@ class Store {
   }
 
   set setCurrDepartmentId(id: string) {
+    console.log('setCurrDepartmentId');
+
+    this.currSupermarketId = this.supermarket._id!;
     this.currDepartmentId = id;
     this.currAisleId = '';
   }
 
   set setCurrAisleId(id: string) {
+    console.log('setCurrAisleId');
+    this.currSupermarketId = this.supermarket._id!;
+
+    this.supermarket.departments.forEach((d) => {
+      if (d.aisles.find((a) => a._id === id)) {
+        this.currDepartmentId = d._id!;
+      }
+    });
+
     this.currAisleId = id;
     this.currProductId = '';
   }
 
   set setCurrProductId(id: string) {
+    console.log('setCurrProductId');
+    this.currSupermarketId = this.supermarket._id!;
+    this.supermarket.departments.forEach((d) => {
+      d.aisles.forEach((a) => {
+        if (a.products.find((p) => p._id === id)) {
+          this.currDepartmentId = d._id!;
+          this.currAisleId = a._id!;
+        }
+      });
+    });
+
     this.currProductId = id;
   }
 
   set setSupermarket(supermarket: Supermarket) {
+    console.log('setSupermarket');
+
     this.supermarket = supermarket;
   }
 }

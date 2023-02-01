@@ -27,10 +27,6 @@ export default observer(function Aisle({ aisle }: { aisle: AisleType }): JSX.Ele
         border: '1px solid purple',
         margin: '5px',
       }}
-      onClick={(e) => {
-        e.stopPropagation();
-        store.setCurrAisleId = aisle._id;
-      }}
     >
       {isModalOpen && (
         <Modal isOpen={true} onClose={() => setIsModalOpen(false)}>
@@ -41,7 +37,15 @@ export default observer(function Aisle({ aisle }: { aisle: AisleType }): JSX.Ele
         </Modal>
       )}
       {store.currAisleId === aisle._id && <span onClick={() => deleteAisle(aisle._id)}>x</span>}
-      <div onClick={(e) => setIsModalOpen(true)}>{aisle.number}</div>
+      <div>{aisle.number}</div>
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsModalOpen(true);
+        }}
+      >
+        edit
+      </div>
       <div>
         <div style={{ display: 'flex', flexDirection: !isHorizontal ? 'column' : 'row' }}>
           {aisle.products.map((product) => {
@@ -52,6 +56,14 @@ export default observer(function Aisle({ aisle }: { aisle: AisleType }): JSX.Ele
             );
           })}
         </div>
+      </div>
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          store.setCurrAisleId = aisle._id;
+        }}
+      >
+        +
       </div>
     </div>
   );
