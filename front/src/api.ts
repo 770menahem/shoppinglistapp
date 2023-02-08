@@ -112,6 +112,22 @@ const changeAisleDirection = async (aisleId: string, direction: Directions) => {
   return res.json();
 };
 
+const ccAisle = async (number: number, direction: Directions, depId: string) => {
+  const res = await createAisle(number, direction);
+
+  await connectDepartmentToAisle(depId, res._id);
+};
+
+const ccProduct = async (name: string, aisleId: string) => {
+  const res = await createProduct(name);
+  await connectAisleToProduct(aisleId, res._id);
+};
+
+const ccDepartment = async (name: string, supermarketId: string) => {
+  const res = await createDepartment(name);
+  await connectSupermarketToDepartment(supermarketId, res._id);
+};
+
 export default {
   // get all
   getSupermarkets,
@@ -133,9 +149,9 @@ export default {
 
   // create
   createSupermarket,
-  createDepartment,
-  createAisle,
-  createProduct,
+  ccAisle,
+  ccProduct,
+  ccDepartment,
 
   // connect
   connectSupermarketToDepartment,

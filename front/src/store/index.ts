@@ -28,7 +28,9 @@ class Store {
       _id: s._id,
       location: s.location,
     }));
-    this.supermarket = res[0];
+    if (!this.supermarket) {
+      this.supermarket = res[0];
+    }
   };
 
   public reset = () => {
@@ -37,6 +39,23 @@ class Store {
     this.currDepartmentId = '';
     this.currAisleId = '';
     this.currProductId = '';
+  };
+
+  public getSupermarkets = async () => {
+    const res = await api.getSupermarkets();
+    this.supermarkets = res.map((s: Supermarket) => ({
+      name: s.name,
+      _id: s._id,
+      location: s.location,
+    }));
+
+    this.supermarket = res[0];
+  };
+
+  public getSuper = async (id: string) => {
+    const res = await api.getSupermarket(id);
+
+    store.setSupermarket = res;
   };
 
   set setSupermarkets(supers: Supermarket[]) {

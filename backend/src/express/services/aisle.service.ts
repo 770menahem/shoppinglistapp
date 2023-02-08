@@ -24,8 +24,8 @@ export class AisleService implements IAisleService {
         return newAisle;
     }
 
-    async update(id: string, name: string): Promise<Aisle | null> {
-        const updatedAisle = await this.aisleRepo.update(id, name);
+    async update(id: string, direction: string): Promise<Aisle | null> {
+        const updatedAisle = await this.aisleRepo.update(id, direction);
         return updatedAisle;
     }
 

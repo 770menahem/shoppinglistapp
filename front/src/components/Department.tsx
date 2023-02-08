@@ -1,6 +1,8 @@
 import { observer } from 'mobx-react-lite';
+import { useQueryClient, useMutation } from 'react-query';
+import api from '../api';
 import store from '../store';
-import { deleteDepartment } from '../store/actions';
+// import { deleteDepartment } from '../store/actions';
 import DepartmentType from '../types/department.type';
 import Aisle from './Aisle';
 
@@ -23,6 +25,19 @@ export default observer(function Department({
     [[], [], []] as typeof department.aisles[]
   );
 
+  const reloadSuper = useMutation({
+    mutationFn: () => api.getSupermarket(store.currSupermarketId),
+    onSuccess: (data) => {
+      store.setSupermarket = data;
+    },
+  });
+  const deleteDepartment = useMutation({
+    mutationFn: (id: string) => api.deleteDepartment(id),
+    onSuccess: () => {
+      reloadSuper.mutate();
+    },
+  });
+
   return (
     <div
       style={{
@@ -33,7 +48,7 @@ export default observer(function Department({
       }}
     >
       {store.currDepartmentId === department._id && (
-        <span onClick={() => deleteDepartment(department._id)}>x</span>
+        <span onClick={() => deleteDepartment.mutate(department._id)}>x</span>
       )}
 
       <div>{department.name}</div>

@@ -10,6 +10,7 @@ const aisleSchema = new mongoose.Schema<aisle>(
         products: [{ type: mongoose.Types.ObjectId, ref: mongo.collectionsNames.product }],
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now },
+        direction: { type: String, required: true },
     },
     { versionKey: false },
 );

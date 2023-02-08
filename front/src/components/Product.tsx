@@ -1,9 +1,19 @@
 import { observer } from 'mobx-react-lite';
+import { useQueryClient, useMutation } from 'react-query';
+import api from '../api';
 import store from '../store';
-import { deleteProduct } from '../store/actions';
+// import { deleteProduct } from '../store/actions';
 import ProductType from '../types/product.type';
 
 export default observer(function Product({ product }: { product: ProductType }): JSX.Element {
+  const queryClient = useQueryClient();
+  const deleteProduct = useMutation({
+    mutationFn: (id: string) => api.deleteProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['supers', store.currSupermarketId], { exact: true });
+    },
+  });
+
   return (
     <div
       style={{
@@ -16,7 +26,7 @@ export default observer(function Product({ product }: { product: ProductType }):
       }}
     >
       {store.currProductId === product._id && (
-        <span onClick={() => deleteProduct(product._id)}>x</span>
+        <span onClick={() => deleteProduct.mutate(product._id)}>x</span>
       )}
       <span>{product.name}</span>
     </div>

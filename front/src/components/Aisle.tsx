@@ -1,7 +1,9 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import api from '../api';
 import store from '../store';
-import { changeAisleDirection, deleteAisle } from '../store/actions';
+// import { changeAisleDirection, deleteAisle } from '../store/actions';
 import AisleType, { Directions } from '../types/aisle.type';
 import DirectionSelect from './directionSelect';
 import Modal from './modal';
@@ -11,13 +13,35 @@ export default observer(function Aisle({ aisle }: { aisle: AisleType }): JSX.Ele
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [direction, setDirection] = useState<Directions>(aisle.direction);
 
+  const reloadSuper = useMutation({
+    mutationFn: () => api.getSupermarket(store.currSupermarketId),
+    onSuccess: (data) => {
+      store.setSupermarket = data;
+    },
+  });
+
+  const change = useMutation({
+    mutationFn: (p: { id: string; direction: Directions }) =>
+      api.changeAisleDirection(p.id, p.direction),
+    onSuccess: () => {
+      reloadSuper.mutate();
+    },
+  });
+
   useEffect(() => {
     if (direction !== aisle.direction) {
-      changeAisleDirection(aisle._id, direction);
+      change.mutate({ id: aisle._id, direction });
     }
   }, [direction]);
 
   const isHorizontal = aisle.direction?.includes('horizontal');
+
+  const deleteAisle = useMutation({
+    mutationFn: (id: string) => api.deleteAisle(id),
+    onSuccess: () => {
+      reloadSuper.mutate();
+    },
+  });
 
   return (
     <div
@@ -32,11 +56,19 @@ export default observer(function Aisle({ aisle }: { aisle: AisleType }): JSX.Ele
         <Modal isOpen={true} onClose={() => setIsModalOpen(false)}>
           <div>
             <span>Change aisle direction</span>
-            <DirectionSelect direction={direction} setDirection={setDirection} />
+            <DirectionSelect
+              direction={direction}
+              setDirection={(dir: Directions) => {
+                setDirection(dir);
+                setIsModalOpen(false);
+              }}
+            />
           </div>
         </Modal>
       )}
-      {store.currAisleId === aisle._id && <span onClick={() => deleteAisle(aisle._id)}>x</span>}
+      {store.currAisleId === aisle._id && (
+        <span onClick={() => deleteAisle.mutate(aisle._id)}>x</span>
+      )}
       <div>{aisle.number}</div>
       <div
         onClick={(e) => {

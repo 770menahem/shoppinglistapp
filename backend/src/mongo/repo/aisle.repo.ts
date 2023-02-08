@@ -14,8 +14,8 @@ export class AisleRepository implements IAisleRepo {
         return newAisle;
     }
 
-    async update(aisleId: string, name: string): Promise<Aisle | null> {
-        return this.AisleModel.findByIdAndUpdate(aisleId, { name }, { new: true });
+    async update(aisleId: string, direction: string): Promise<Aisle | null> {
+        return this.AisleModel.findByIdAndUpdate(aisleId, { direction }, { new: true });
     }
 
     async delete(aisleId: string): Promise<Aisle | null> {

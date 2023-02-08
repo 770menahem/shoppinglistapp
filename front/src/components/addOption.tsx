@@ -1,7 +1,9 @@
 import { observer } from 'mobx-react-lite';
 import React, { CSSProperties, useState } from 'react';
+import { QueryClient, useMutation, useQuery, useQueryClient } from 'react-query';
+import api from '../api';
 import store from '../store';
-import { createAisle, createDepartment, createProduct, createSuper } from '../store/actions';
+// import { createAisle, createDepartment, createProduct, createSuper } from '../store/actions';
 import { Directions } from '../types/aisle.type';
 import DirectionSelect from './directionSelect';
 
@@ -21,6 +23,53 @@ function AddOption() {
     display: 'flex',
     flexDirection: 'column',
   };
+
+  const queryClient = useQueryClient();
+
+  const reloadSuper = useMutation({
+    mutationFn: () => api.getSupermarket(currSupermarketId),
+    onSuccess: (data) => {
+      store.setSupermarket = data;
+    },
+  });
+
+  const reloadSupermarkets = useMutation({
+    mutationFn: api.getSupermarkets,
+    onSuccess: (data) => {
+      store.setSupermarkets = data;
+      store.setSupermarket = data[data.length - 1];
+    },
+  });
+
+  const createSuper = useMutation({
+    mutationFn: (p: { name: string; location: string }) =>
+      api.createSupermarket(p.name, p.location),
+    onSuccess: () => {
+      reloadSupermarkets.mutate();
+    },
+  });
+
+  const createDepartment = useMutation({
+    mutationFn: (name: string) => api.ccDepartment(name, currSupermarketId),
+    onSuccess: () => {
+      reloadSuper.mutate();
+    },
+  });
+
+  const createAisle = useMutation({
+    mutationFn: (p: { number: number; direction: Directions }) =>
+      api.ccAisle(p.number, p.direction, currDepartmentId),
+    onSuccess: () => {
+      reloadSuper.mutate();
+    },
+  });
+
+  const createProduct = useMutation({
+    mutationFn: (name: string) => api.ccProduct(name, currAisleId),
+    onSuccess: () => {
+      reloadSuper.mutate();
+    },
+  });
 
   return (
     <div
@@ -53,7 +102,11 @@ function AddOption() {
               placeholder='Supermarket location'
               onChange={(e) => setSupermarketLocation(e.target.value)}
             />
-            <button onClick={() => createSuper(supermarketName, supermarketLocation)}>
+            <button
+              onClick={() =>
+                createSuper.mutate({ name: supermarketName, location: supermarketLocation })
+              }
+            >
               הוספת סופרמרקט
             </button>
           </div>
@@ -66,7 +119,7 @@ function AddOption() {
               placeholder='Department Name'
               onChange={(e) => setDepartmentName(e.target.value)}
             />
-            <button onClick={() => createDepartment(departmentName)}>הוספת מחלקה</button>
+            <button onClick={() => createDepartment.mutate(departmentName)}>הוספת מחלקה</button>
           </div>
         )}
         {!aisle && department && supermarket && (
@@ -78,7 +131,9 @@ function AddOption() {
               onChange={(e) => setAisleNumber(e.target.value)}
             />
             <DirectionSelect direction={direction} setDirection={setDirection} />
-            <button onClick={() => createAisle(+aisleNumber, direction)}>הוספת מעבר</button>
+            <button onClick={() => createAisle.mutate({ number: +aisleNumber, direction })}>
+              הוספת מעבר
+            </button>
           </div>
         )}
         {aisle && department && supermarket && (
@@ -89,7 +144,7 @@ function AddOption() {
               placeholder='Product Name'
               onChange={(e) => setProductName(e.target.value)}
             />
-            <button onClick={() => createProduct(productName)}>הוספת מוצר</button>
+            <button onClick={() => createProduct.mutate(productName)}>הוספת מוצר</button>
           </div>
         )}
       </div>

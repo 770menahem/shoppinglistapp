@@ -1,6 +1,8 @@
 import { observer } from 'mobx-react-lite';
+import { useMutation, useQueryClient } from 'react-query';
+import api from '../api';
 import store from '../store';
-import { deleteSupermarket } from '../store/actions';
+// import { deleteSupermarket } from '../store/actions';
 
 import Department from './Department';
 
@@ -12,11 +14,29 @@ function SuperList() {
     store.setCurrSupermarketId = supermarket._id;
   };
 
+  const reloadSupermarkets = useMutation({
+    mutationFn: api.getSupermarkets,
+    onSuccess: (data) => {
+      store.setSupermarkets = data;
+      if (!data.map((d: { _id: string }) => d._id).includes(store.currSupermarketId)) {
+        store.setSupermarket = data[0];
+      }
+    },
+  });
+
+  const deleteSupermarket = useMutation({
+    mutationFn: api.deleteSupermarket,
+    onSuccess: () => {
+      reloadSupermarkets.mutate();
+      reset();
+    },
+  });
+
   return (
     <div>
       <div style={{ border: '1px solid green' }}>
         {store.currSupermarketId === supermarket._id && (
-          <span onClick={() => deleteSupermarket(supermarket._id)}>x</span>
+          <span onClick={() => deleteSupermarket.mutate(supermarket._id)}>x</span>
         )}
         <div>
           {supermarket.name}

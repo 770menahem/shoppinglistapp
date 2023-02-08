@@ -39,3 +39,27 @@
 .read-the-docs {
   color: #888;
 }
+
+.circularSearch {
+  position: relative;
+}
+
+.circularSearch > * {
+  position: absolute;
+  transition: all 0.2s ease 0s;
+  padding: 0.5em;
+  border-radius: 50%;
+}
+
+.circularSearch :first-child {
+  transform: translateX(0) translateY(0%);
+  background: #646cff;
+}
+
+.circularSearch :nth-child(2) {
+  transform: translateX(100%) translateY(100%);
+}
+
+.circularSearch :last-child {
+  transform: translateX(-100%) translateY(100%);
+}
